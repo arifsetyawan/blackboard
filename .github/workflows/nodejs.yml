@@ -1,9 +1,6 @@
 name: Node CI
 
-on:
-  pull_request:
-    - master
-    - develop
+on: [pull_request]
 
 jobs:
   build:
