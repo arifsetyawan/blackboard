@@ -1,0 +1,26 @@
+{
+  "name": "blackboard",
+  "version": "1.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arifsetyawan/blackboard.git"
+  },
+  "author": "Arif Setyawan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arifsetyawan/blackboard/issues"
+  },
+  "homepage": "https://github.com/arifsetyawan/blackboard#readme",
+  "dependencies": {
+    "@nestjs/common": "^6.7.1",
+    "@nestjs/core": "^6.7.1",
+    "lodash": "^4.17.15",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.5.3"
+  }
+}
