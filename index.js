@@ -1,7 +1,7 @@
-import _ from "lodash";
+const _ = require('lodash');
 
-export function hello() {
-  console.log("hai there");
+module.exports.hello = () => {
+  return _.toLower('hai there');
 }
 
 
