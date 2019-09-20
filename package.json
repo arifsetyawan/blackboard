@@ -17,11 +17,7 @@
   },
   "homepage": "https://github.com/arifsetyawan/blackboard#readme",
   "dependencies": {
-    "@nestjs/common": "^6.7.1",
-    "@nestjs/core": "^6.7.1",
-    "lodash": "^4.17.15",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^6.5.3"
+    "lodash": "^4.17.15"
   },
   "publishConfig": { "registry": "https://npm.pkg.github.com/"}
 }

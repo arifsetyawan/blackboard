@@ -1,7 +1,7 @@
-const _ = require("lodash");
+import _ from "lodash";
 
-exports.default.main = async () => {
-  console.log('Hello World')
+export function hello() {
+  console.log("hai there");
 }
 
 
