@@ -1,7 +1,8 @@
-const _ = require("lodash");
+const _ = require('lodash');
 
-exports.default.main = async () => {
-  console.log('Hello World')
+module.exports.hello = () => {
+  console.log('world');
+  return _.toLower('hai there');
 }
 
 
