@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/arifsetyawan/blackboard#readme",
   "dependencies": {
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "jest": "^24.9.0"
   },
   "publishConfig": { "registry": "https://npm.pkg.github.com/"}
