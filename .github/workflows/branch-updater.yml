@@ -36,49 +36,58 @@ jobs:
         run: |
           conflicts=()
           successful_updates=()
+          branch_list="${{ steps.get-branches.outputs.branches }}"
+
+          if [ -z "$branch_list" ]; then
+          echo "No CR branches to update"
+          exit 0
+          fi
+
+          for branch in $branch_list; do
+          echo "Processing branch: $branch"
           
-          for branch in ${{ steps.get-branches.outputs.branches }}; do
-            echo "Processing branch: $branch"
-            
-            # Checkout the CR branch
-            git checkout "$branch"
-            git reset --hard "origin/$branch"
-            
-            # Attempt to merge master
-            if git merge origin/master --no-edit; then
-              echo "✅ Successfully merged master into $branch"
+          # Checkout the CR branch
+          git checkout "$branch"
+          git reset --hard "origin/$branch"
+          
+          # Attempt to merge main
+          if git merge origin/main --no-edit; then
+              echo "✅ Successfully merged main into $branch"
               
               # Push the updated branch
               if git push origin "$branch"; then
-                echo "✅ Successfully pushed updated $branch"
-                successful_updates+=("$branch")
+              echo "✅ Successfully pushed updated $branch"
+              successful_updates+=("$branch")
               else
-                echo "❌ Failed to push $branch"
+              echo "❌ Failed to push $branch"
               fi
-            else
+          else
               echo "❌ Conflict detected in $branch"
               conflicts+=("$branch")
               
               # Abort the merge
               git merge --abort
-            
-            echo "---"
-          done
+              
+              # Send webhook notification for conflict
+          fi
           
+          echo "---"
+          done
+
           # Summary
           echo "## Summary"
           echo "Successful updates: ${#successful_updates[@]}"
           echo "Conflicts: ${#conflicts[@]}"
-          
+
           if [ ${#successful_updates[@]} -gt 0 ]; then
-            echo "Successfully updated branches:"
-            printf '  - %s\n' "${successful_updates[@]}"
+          echo "Successfully updated branches:"
+          printf '  - %s\n' "${successful_updates[@]}"
           fi
-          
+
           if [ ${#conflicts[@]} -gt 0 ]; then
-            echo "Branches with conflicts:"
-            printf '  - %s\n' "${conflicts[@]}"
-            
-            # Set step output for conflicts
-            echo "conflicts=${conflicts[*]}" >> $GITHUB_OUTPUT
+          echo "Branches with conflicts:"
+          printf '  - %s\n' "${conflicts[@]}"
+          
+          # Set step output for conflicts
+          echo "conflicts=${conflicts[*]}" >> $GITHUB_OUTPUT
           fi
