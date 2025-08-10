@@ -1,0 +1,85 @@
+name: Update CR Branches
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  update-cr-branches:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get all CR branches
+        id: get-branches
+        run: |
+          # Get all remote branches that start with CR-
+          branches=$(git branch -r | grep -E 'origin/CR-' | sed 's/origin\///' | tr '\n' ' ')
+          echo "Found CR branches: $branches"
+          echo "branches=$branches" >> $GITHUB_OUTPUT
+
+      - name: Update CR branches
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          conflicts=()
+          successful_updates=()
+          
+          for branch in ${{ steps.get-branches.outputs.branches }}; do
+            echo "Processing branch: $branch"
+            
+            # Checkout the CR branch
+            git checkout "$branch"
+            git reset --hard "origin/$branch"
+            
+            # Attempt to merge master
+            if git merge origin/master --no-edit; then
+              echo "✅ Successfully merged master into $branch"
+              
+              # Push the updated branch
+              if git push origin "$branch"; then
+                echo "✅ Successfully pushed updated $branch"
+                successful_updates+=("$branch")
+              else
+                echo "❌ Failed to push $branch"
+              fi
+            else
+              echo "❌ Conflict detected in $branch"
+              conflicts+=("$branch")
+              
+              # Abort the merge
+              git merge --abort
+            
+            echo "---"
+          done
+          
+          # Summary
+          echo "## Summary"
+          echo "Successful updates: ${#successful_updates[@]}"
+          echo "Conflicts: ${#conflicts[@]}"
+          
+          if [ ${#successful_updates[@]} -gt 0 ]; then
+            echo "Successfully updated branches:"
+            printf '  - %s\n' "${successful_updates[@]}"
+          fi
+          
+          if [ ${#conflicts[@]} -gt 0 ]; then
+            echo "Branches with conflicts:"
+            printf '  - %s\n' "${conflicts[@]}"
+            
+            # Set step output for conflicts
+            echo "conflicts=${conflicts[*]}" >> $GITHUB_OUTPUT
+          fi
